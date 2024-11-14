@@ -1,0 +1,30 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: Lms-notification
+  kafka:
+    bootstrap-servers: localhost:9094
+    session:
+      timeout:
+        ms: 15000
+
+    consumer:
+      group-id: "consumer-1"
+      max:
+        poll:
+          records: 1
+          interval:
+            ms: 3000
+
+    listener:
+      poll:
+        timeout: 1000
+    max:
+      partition:
+        fetch:
+          bytes: 300000
+
+    topic:
+      notification-events: lms-topic
