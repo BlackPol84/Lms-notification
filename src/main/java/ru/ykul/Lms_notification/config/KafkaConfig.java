@@ -16,7 +16,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
-import ru.ykul.Lms_notification.model.dto.CourseStartNotificationEventDto;
+import ru.ykul.Lms_notification.model.dto.CourseNotificationDto;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class KafkaConfig {
     private Long listenerPollTimeout;
 
     @Bean
-    public ConsumerFactory<String, CourseStartNotificationEventDto> consumerListenerFactory() {
+    public ConsumerFactory<String, CourseNotificationDto> consumerListenerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -63,9 +63,9 @@ public class KafkaConfig {
     }
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String, CourseStartNotificationEventDto> kafkaListenerContainerFactory
-            (@Qualifier("consumerListenerFactory") ConsumerFactory<String, CourseStartNotificationEventDto> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, CourseStartNotificationEventDto> factory =
+    ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> kafkaListenerContainerFactory
+            (@Qualifier("consumerListenerFactory") ConsumerFactory<String, CourseNotificationDto> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factoryBuilder(consumerFactory, factory);
         return factory;

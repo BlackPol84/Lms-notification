@@ -8,7 +8,7 @@ import ru.ykul.Lms_notification.model.MessageType;
 @AllArgsConstructor
 @Setter
 @Getter
-public class CourseStartNotificationEventDto {
+public class CourseNotificationDto {
 
     private MessageType type;
     private String message;
