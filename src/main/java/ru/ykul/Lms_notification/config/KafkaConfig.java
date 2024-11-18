@@ -15,6 +15,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
+import ru.ykul.Lms_notification.exception.KafkaNotRetryableRuntimeException;
 import ru.ykul.Lms_notification.model.dto.CourseNotificationDto;
 
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class KafkaConfig {
     @Bean
     public CommonErrorHandler errorHandler() {
         DefaultErrorHandler handler = new DefaultErrorHandler(new FixedBackOff(1000, 3));
-        handler.addNotRetryableExceptions(IllegalStateException.class);
+        handler.addNotRetryableExceptions(KafkaNotRetryableRuntimeException.class);
 
         return handler;
     }
