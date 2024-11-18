@@ -3,7 +3,6 @@ package ru.ykul.Lms_notification.config;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,16 +28,6 @@ public class KafkaConfig {
     private String servers;
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
-    @Value("${spring.kafka.session.timeout.ms}")
-    private String sessionTimeout;
-    @Value("${spring.kafka.max.partition.fetch.bytes}")
-    private String maxPartitionFetchBytes;
-    @Value("${spring.kafka.consumer.max.poll.records}")
-    private String maxPollRecords;
-    @Value("${spring.kafka.consumer.max.poll.interval.ms}")
-    private String maxPollIntervalsMs;
-    @Value("${spring.kafka.listener.poll.timeout}")
-    private Long listenerPollTimeout;
 
     @Bean
     public ConsumerFactory<String, CourseNotificationDto> consumerListenerFactory() {
@@ -47,46 +36,32 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.ykul.Lms_notification.model.dto.CourseStartNotificationEventDto");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.ykul.Lms_notification.model.dto.CourseNotificationDto");
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
-        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeout);
-        props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxPollIntervalsMs);
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, JsonDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> kafkaListenerContainerFactory
-            (@Qualifier("consumerListenerFactory") ConsumerFactory<String, CourseNotificationDto> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factoryBuilder(consumerFactory, factory);
-        return factory;
-    }
-
-    private <T> void factoryBuilder(ConsumerFactory<String, T> consumerFactory, ConcurrentKafkaListenerContainerFactory<String, T> factory) {
-        factory.setConsumerFactory(consumerFactory);
-        factory.setBatchListener(true);
-        factory.setConcurrency(1);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-        factory.getContainerProperties().setPollTimeout(listenerPollTimeout);
-        factory.getContainerProperties().setMicrometerEnabled(true);
-        factory.setCommonErrorHandler(errorHandler());
-    }
-
-    private CommonErrorHandler errorHandler() {
+    public CommonErrorHandler errorHandler() {
         DefaultErrorHandler handler = new DefaultErrorHandler(new FixedBackOff(1000, 3));
         handler.addNotRetryableExceptions(IllegalStateException.class);
-        handler.setRetryListeners((record, ex, deliveryAttempt) ->
-                log.error("RetryListeners message = {}, offset = {} deliveryAttempt = {}",
-                        ex.getMessage(), record.offset(), deliveryAttempt));
+
         return handler;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        factory.setConsumerFactory(consumerListenerFactory());
+        factory.setCommonErrorHandler(errorHandler());
+
+        return factory;
     }
 }
