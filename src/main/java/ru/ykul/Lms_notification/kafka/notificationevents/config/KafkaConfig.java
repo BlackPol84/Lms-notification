@@ -1,4 +1,4 @@
-package ru.ykul.Lms_notification.config;
+package ru.ykul.Lms_notification.kafka.notificationevents.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

@@ -11,5 +11,4 @@ spring:
     consumer:
       group-id: "consumer-1"
 
-    topic:
-      notification-events: lms-topic
+    topic: notification-events
