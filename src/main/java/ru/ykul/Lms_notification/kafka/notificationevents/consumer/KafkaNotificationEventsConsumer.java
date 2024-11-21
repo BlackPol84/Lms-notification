@@ -12,7 +12,8 @@ import java.util.List;
 @Component
 public class KafkaNotificationEventsConsumer {
 
-    @KafkaListener(id = "${spring.kafka.consumer.group-id}", topics = "${spring.kafka.topic}")
+    @KafkaListener(id = "${spring.application.kafka.consumer.group-id}",
+                   topics = "${spring.application.kafka.topic}")
     public void listener(@Payload List<CourseNotificationDto> massegeList) {
 
         massegeList.stream().map(CourseNotificationDto::message)

@@ -5,10 +5,8 @@ spring:
   application:
     name: Lms-notification
 
-  kafka:
-    bootstrap-servers: localhost:9094
-
-    consumer:
-      group-id: "consumer-1"
-
-    topic: notification-events
+    kafka:
+      bootstrap-servers: localhost:9094
+      consumer:
+        group-id: "consumer-1"
+      topic: notification-events
