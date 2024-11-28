@@ -30,8 +30,8 @@ public class MailConfig {
 
     @Bean
     public Map<MessageType, DeliveryService> deliverylServiceMap(CourseEmailDeliveryService emailService) {
-        Map<MessageType, DeliveryService> emailServiceMap = new EnumMap<>(MessageType.class);
-        emailServiceMap.put(MessageType.EMAIL, emailService);
-        return emailServiceMap;
+        Map<MessageType, DeliveryService> deliverylServiceMap = new EnumMap<>(MessageType.class);
+        deliverylServiceMap.put(MessageType.EMAIL, emailService);
+        return deliverylServiceMap;
     }
 }
