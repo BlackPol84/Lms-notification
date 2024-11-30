@@ -15,7 +15,7 @@ public class CourseEmailDeliveryService implements DeliveryService {
 
     public void sendCourseNotification(CourseNotificationDto notificationDto) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("random@gmail.com");
+        message.setTo(notificationDto.email());
         message.setSubject("Lms-notification");
         message.setText(notificationDto.message());
         mailSender.send(message);
