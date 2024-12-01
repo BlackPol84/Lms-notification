@@ -16,7 +16,7 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 import ru.ykul.Lms_notification.exception.KafkaNotRetryableRuntimeException;
-import ru.ykul.Lms_notification.model.dto.CourseNotificationDto;
+import ru.ykul.Lms_notification.model.dto.NotificationDto;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,13 +31,13 @@ public class KafkaConfig {
     private String groupId;
 
     @Bean
-    public ConsumerFactory<String, CourseNotificationDto> consumerListenerFactory() {
+    public ConsumerFactory<String, NotificationDto> consumerListenerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.ykul.Lms_notification.model.dto.CourseNotificationDto");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.ykul.Lms_notification.model.dto.NotificationDto");
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
@@ -56,8 +56,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, CourseNotificationDto> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, NotificationDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificationDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         factory.setConsumerFactory(consumerListenerFactory());
