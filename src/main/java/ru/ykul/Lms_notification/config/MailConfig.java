@@ -1,6 +1,5 @@
 package ru.ykul.Lms_notification.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +7,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import ru.ykul.Lms_notification.model.MessageType;
 import ru.ykul.Lms_notification.service.NotificationService;
-import ru.ykul.Lms_notification.service.impl.EmailNotificationService;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -31,10 +29,11 @@ public class MailConfig {
 
     @Bean
     public Map<MessageType, NotificationService> notificationServiceMap
-            (@Qualifier("emailNotificationService") NotificationService service) {
+            (NotificationService emailNotificationService, NotificationService smsNotificationService) {
         Map<MessageType, NotificationService> notificationServiceMap =
                 new EnumMap<>(MessageType.class);
-        notificationServiceMap.put(MessageType.EMAIL, service);
+        notificationServiceMap.put(MessageType.EMAIL, emailNotificationService);
+        notificationServiceMap.put(MessageType.SMS, smsNotificationService);
         return notificationServiceMap;
     }
 }
